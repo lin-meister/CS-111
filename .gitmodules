@@ -1,0 +1,6 @@
+[submodule "cs111p3a"]
+	path = cs111p3a
+	url = https://github.com/lin-meister/cs111p3a.git
+[submodule "cs111p3b"]
+	path = cs111p3b
+	url = https://github.com/lin-meister/cs111p3b.git
