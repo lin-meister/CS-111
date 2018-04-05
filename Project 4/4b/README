@@ -1,0 +1,31 @@
+NAME: Chaoran Lin
+EMAIL: linmc@ucla.edu
+ID: 004674598
+
+Included files
+======
+
+lab4b.c contains the code that samples the temperature sensor and Grove button
+attached to an Intel Edison board for a user-specified rate of seconds, and
+allows for optional logging of the samples to a log file. It also allows the
+user to input user commands that may change the way the sampling works.
+
+Makefile contains default, check, clean, and dist targets to compile the code,
+run smoke tests, clean generated output, and make a tarball.
+
+README contains an overview of this project.
+
+References
+======
+http://pubs.opengroup.org/onlinepubs/009695399/basedefs/fcntl.h.html
+http://www.cplusplus.com/reference/cstring/strcmp/
+http://www.cplusplus.com/reference/cstring/strcat/
+http://www.cplusplus.com/reference/ctime/clock/
+http://www.cplusplus.com/reference/ctime/time/
+http://www.cplusplus.com/reference/ctime/tm/
+http://www.cplusplus.com/reference/ctime/time_t/
+http://www.cplusplus.com/reference/ctime/strftime/
+http://www.cplusplus.com/reference/ctime/localtime/
+https://www.programiz.com/c-programming/library-function/ctype.h/isdigit
+http://stackoverflow.com/questions/4214314/get-a-substring-of-a-char
+http://www.cplusplus.com/reference/cstring/strtok/

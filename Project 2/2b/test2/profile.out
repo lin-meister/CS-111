@@ -1,0 +1,263 @@
+Total: 1079 samples
+     928  86.0%  86.0%     1079 100.0% listFunc
+     112  10.4%  96.4%      112  10.4% __strcmp_sse42
+      20   1.9%  98.2%       74   6.9% SortedList_insert
+      18   1.7%  99.9%       76   7.0% SortedList_lookup
+       1   0.1% 100.0%        1   0.1% 0x00007fff80e797f4
+       0   0.0% 100.0%        1   0.1% __clock_gettime
+       0   0.0% 100.0%     1079 100.0% __clone
+       0   0.0% 100.0%     1079 100.0% start_thread
+ROUTINE ====================== listFunc in /u/eng/class/classnin/cs111p2/test/lab2_list.c
+   928   1079 Total samples (flat / cumulative)
+     .      .   90:     length += listLength;
+     .      .   91:   } 
+     .      .   92:   return length;
+     .      .   93: }
+     .      .   94: 
+---
+     .      .   95: void* listFunc(void* threadArg) {
+     .      .   96:   struct thread_data *threadData = (struct thread_data *) threadArg;
+     .      .   97:   int start = threadData->startIndex;
+     .      .   98:   int end = threadData->endIndex;
+     .      .   99: 
+     .      .  100:   // Insert
+     .      .  101:   uint64_t diff;
+     .      .  102:   long long unsigned int lockTime = 0; 
+     .      .  103:   struct timespec timeStart, timeEnd;
+     .      .  104: 
+     .      .  105:   int i;
+     .      .  106:   for (i = start; i < end; i++) {
+     .      .  107:     int sublistNum = hash(&elements[i]);
+     .      .  108: 
+     .      .  109:     if (syncOption != '\0') {
+     .      .  110:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  111:         error("Error with clock gettime");
+     .      .  112: 
+     .      .  113:       if (syncOption == 'm')
+     .      .  114: 	pthread_mutex_lock(&mutexList[sublistNum]);
+     .      .  115:       else if (syncOption == 's')
+   619    619  116: 	while (__sync_lock_test_and_set(&spinLockList[sublistNum], 1));
+     .      .  117: 
+     .      1  118:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  119:         error("Error with clock gettime");
+     .      .  120: 
+     .      .  121:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  122:       lockTime += (long long unsigned int) diff;
+     .      .  123:       lockOperations++;
+     .      .  124:     }
+     .      .  125: 
+     .     74  126:     SortedList_insert(&lists[sublistNum], &elements[i]);
+     .      .  127: 
+     .      .  128:     if (syncOption != '\0') {
+     .      .  129:       if (syncOption == 'm')
+     .      .  130: 	pthread_mutex_unlock(&mutexList[sublistNum]);
+     .      .  131:        else if (syncOption == 's')
+     .      .  132: 	__sync_lock_release(&spinLockList[sublistNum]);
+     .      .  133:     }
+     .      .  134:   }
+     .      .  135: 
+     .      .  136:   // Get length
+     .      .  137:   int length = 0;
+     .      .  138:   for (i = 0; i < numLists; i++) {
+     .      .  139:     if (syncOption != '\0') {
+     .      .  140:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  141:         error("Error with clock gettime");
+     .      .  142: 
+     .      .  143:       if (syncOption == 'm')
+     .      .  144:         pthread_mutex_lock(&mutexList[i]);
+     .      .  145:       else if (syncOption == 's')
+     .      .  146:         while (__sync_lock_test_and_set(&spinLockList[i], 1));
+     .      .  147: 
+     .      .  148:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  149:         error("Error with clock gettime");
+     .      .  150: 
+     .      .  151:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  152:       lockTime += (long long unsigned int) diff;
+     .      .  153:       lockOperations++;
+     .      .  154:     }
+     .      .  155: 
+     .      .  156:     int listLength = SortedList_length(&lists[i]);
+     .      .  157: 
+     .      .  158:     if (listLength == -1)
+     .      .  159:       corruptedHandler();
+     .      .  160:     length += listLength;
+     .      .  161:     
+     .      .  162:     if (syncOption != '\0') {
+     .      .  163:       if (syncOption == 'm')
+     .      .  164:         pthread_mutex_unlock(&mutexList[i]);
+     .      .  165:       else if (syncOption == 's')
+     .      .  166:         __sync_lock_release(&spinLockList[i]);
+     .      .  167:     }
+     .      .  168:   }
+     .      .  169: 
+     .      .  170:   // Lookup and delete
+     .      .  171:   SortedListElement_t * lookup;
+     .      .  172:   for (i = start; i < end; i++) {
+     .      .  173:     int sublistNum = hash(&elements[i]);
+     .      .  174:     if (syncOption != '\0') {
+     .      .  175:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  176:         error("Error with clock gettime");
+     .      .  177: 
+     .      .  178:       if (syncOption == 'm')
+     .      .  179:         pthread_mutex_lock(&mutexList[sublistNum]);
+     .      .  180:       else if (syncOption == 's')
+   309    309  181:         while (__sync_lock_test_and_set(&spinLockList[sublistNum], 1));
+     .      .  182:       
+     .      .  183:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  184:         error("Error with clock gettime");
+     .      .  185: 
+     .      .  186:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  187:       lockTime += (long long unsigned int) diff;
+     .      .  188: 
+     .      .  189:       lockOperations++;
+     .      .  190:     }
+     .      .  191: 
+     .     76  192:     lookup = SortedList_lookup(&lists[sublistNum], elements[i].key);
+     .      .  193:     if (SortedList_delete(lookup) == 1)
+     .      .  194:       corruptedHandler();
+     .      .  195: 
+     .      .  196:     if (syncOption != '\0') {
+     .      .  197:       if (syncOption == 'm')
+     .      .  198:         pthread_mutex_unlock(&mutexList[sublistNum]);
+     .      .  199:       else if (syncOption == 's')
+     .      .  200:         __sync_lock_release(&spinLockList[sublistNum]);
+     .      .  201:     }
+     .      .  202:   }
+     .      .  203: 
+     .      .  204:   //  fprintf(stderr, "Locktime for thread %d: %llu\n", threadData->thread_id, lockTime);
+     .      .  205:   threadData->lockTime = lockTime;
+     .      .  206: 
+     .      .  207:   pthread_exit(NULL);
+---
+     .      .  208: }
+     .      .  209: 
+     .      .  210: void sigsegv_handler(int signum) {
+     .      .  211:   fprintf(stderr, "Caught a SIGSEGV signal (segmentation fault) \n");
+     .      .  212:   exit(2);
+ROUTINE ====================== listFunc in /u/eng/class/classnin/cs111p2/test/lab2_list.c
+   928   1079 Total samples (flat / cumulative)
+     .      .   90:     length += listLength;
+     .      .   91:   } 
+     .      .   92:   return length;
+     .      .   93: }
+     .      .   94: 
+---
+     .      .   95: void* listFunc(void* threadArg) {
+     .      .   96:   struct thread_data *threadData = (struct thread_data *) threadArg;
+     .      .   97:   int start = threadData->startIndex;
+     .      .   98:   int end = threadData->endIndex;
+     .      .   99: 
+     .      .  100:   // Insert
+     .      .  101:   uint64_t diff;
+     .      .  102:   long long unsigned int lockTime = 0; 
+     .      .  103:   struct timespec timeStart, timeEnd;
+     .      .  104: 
+     .      .  105:   int i;
+     .      .  106:   for (i = start; i < end; i++) {
+     .      .  107:     int sublistNum = hash(&elements[i]);
+     .      .  108: 
+     .      .  109:     if (syncOption != '\0') {
+     .      .  110:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  111:         error("Error with clock gettime");
+     .      .  112: 
+     .      .  113:       if (syncOption == 'm')
+     .      .  114: 	pthread_mutex_lock(&mutexList[sublistNum]);
+     .      .  115:       else if (syncOption == 's')
+   619    619  116: 	while (__sync_lock_test_and_set(&spinLockList[sublistNum], 1));
+     .      .  117: 
+     .      1  118:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  119:         error("Error with clock gettime");
+     .      .  120: 
+     .      .  121:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  122:       lockTime += (long long unsigned int) diff;
+     .      .  123:       lockOperations++;
+     .      .  124:     }
+     .      .  125: 
+     .     74  126:     SortedList_insert(&lists[sublistNum], &elements[i]);
+     .      .  127: 
+     .      .  128:     if (syncOption != '\0') {
+     .      .  129:       if (syncOption == 'm')
+     .      .  130: 	pthread_mutex_unlock(&mutexList[sublistNum]);
+     .      .  131:        else if (syncOption == 's')
+     .      .  132: 	__sync_lock_release(&spinLockList[sublistNum]);
+     .      .  133:     }
+     .      .  134:   }
+     .      .  135: 
+     .      .  136:   // Get length
+     .      .  137:   int length = 0;
+     .      .  138:   for (i = 0; i < numLists; i++) {
+     .      .  139:     if (syncOption != '\0') {
+     .      .  140:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  141:         error("Error with clock gettime");
+     .      .  142: 
+     .      .  143:       if (syncOption == 'm')
+     .      .  144:         pthread_mutex_lock(&mutexList[i]);
+     .      .  145:       else if (syncOption == 's')
+     .      .  146:         while (__sync_lock_test_and_set(&spinLockList[i], 1));
+     .      .  147: 
+     .      .  148:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  149:         error("Error with clock gettime");
+     .      .  150: 
+     .      .  151:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  152:       lockTime += (long long unsigned int) diff;
+     .      .  153:       lockOperations++;
+     .      .  154:     }
+     .      .  155: 
+     .      .  156:     int listLength = SortedList_length(&lists[i]);
+     .      .  157: 
+     .      .  158:     if (listLength == -1)
+     .      .  159:       corruptedHandler();
+     .      .  160:     length += listLength;
+     .      .  161:     
+     .      .  162:     if (syncOption != '\0') {
+     .      .  163:       if (syncOption == 'm')
+     .      .  164:         pthread_mutex_unlock(&mutexList[i]);
+     .      .  165:       else if (syncOption == 's')
+     .      .  166:         __sync_lock_release(&spinLockList[i]);
+     .      .  167:     }
+     .      .  168:   }
+     .      .  169: 
+     .      .  170:   // Lookup and delete
+     .      .  171:   SortedListElement_t * lookup;
+     .      .  172:   for (i = start; i < end; i++) {
+     .      .  173:     int sublistNum = hash(&elements[i]);
+     .      .  174:     if (syncOption != '\0') {
+     .      .  175:       if (clock_gettime( CLOCK_REALTIME, &timeStart) == -1)
+     .      .  176:         error("Error with clock gettime");
+     .      .  177: 
+     .      .  178:       if (syncOption == 'm')
+     .      .  179:         pthread_mutex_lock(&mutexList[sublistNum]);
+     .      .  180:       else if (syncOption == 's')
+   309    309  181:         while (__sync_lock_test_and_set(&spinLockList[sublistNum], 1));
+     .      .  182:       
+     .      .  183:       if (clock_gettime( CLOCK_REALTIME, &timeEnd) == -1)
+     .      .  184:         error("Error with clock gettime");
+     .      .  185: 
+     .      .  186:       diff = BILLION * (timeEnd.tv_sec - timeStart.tv_sec) + timeEnd.tv_nsec - timeStart.tv_nsec;
+     .      .  187:       lockTime += (long long unsigned int) diff;
+     .      .  188: 
+     .      .  189:       lockOperations++;
+     .      .  190:     }
+     .      .  191: 
+     .     76  192:     lookup = SortedList_lookup(&lists[sublistNum], elements[i].key);
+     .      .  193:     if (SortedList_delete(lookup) == 1)
+     .      .  194:       corruptedHandler();
+     .      .  195: 
+     .      .  196:     if (syncOption != '\0') {
+     .      .  197:       if (syncOption == 'm')
+     .      .  198:         pthread_mutex_unlock(&mutexList[sublistNum]);
+     .      .  199:       else if (syncOption == 's')
+     .      .  200:         __sync_lock_release(&spinLockList[sublistNum]);
+     .      .  201:     }
+     .      .  202:   }
+     .      .  203: 
+     .      .  204:   //  fprintf(stderr, "Locktime for thread %d: %llu\n", threadData->thread_id, lockTime);
+     .      .  205:   threadData->lockTime = lockTime;
+     .      .  206: 
+     .      .  207:   pthread_exit(NULL);
+---
+     .      .  208: }
+     .      .  209: 
+     .      .  210: void sigsegv_handler(int signum) {
+     .      .  211:   fprintf(stderr, "Caught a SIGSEGV signal (segmentation fault) \n");
+     .      .  212:   exit(2);

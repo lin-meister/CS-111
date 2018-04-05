@@ -1,0 +1,12 @@
+http://pubs.opengroup.org/onlinepubs/009695399/basedefs/fcntl.h.html
+http://www.cplusplus.com/reference/cstring/strcmp/
+http://www.cplusplus.com/reference/cstring/strcat/
+http://www.cplusplus.com/reference/ctime/clock/
+http://www.cplusplus.com/reference/ctime/time/
+http://www.cplusplus.com/reference/ctime/tm/
+http://www.cplusplus.com/reference/ctime/time_t/
+http://www.cplusplus.com/reference/ctime/strftime/
+http://www.cplusplus.com/reference/ctime/localtime/
+https://www.programiz.com/c-programming/library-function/ctype.h/isdigit
+http://stackoverflow.com/questions/4214314/get-a-substring-of-a-char
+http://www.cplusplus.com/reference/cstring/strtok/
