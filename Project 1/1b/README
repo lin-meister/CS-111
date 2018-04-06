@@ -1,0 +1,57 @@
+NAME: Chaoran Lin
+EMAIL: linmc@ucla.edu
+ID: 004674598
+
+Slip days
+======
+
+I would like to use 1 of my remaining 5 slip days. After this, I will have 4 
+remaining days.
+
+Included files
+======
+
+lab1b-client.c contains the client-side logic written in C. When the user uses the port
+option along with specifying a port number greater than 1024, the process will attempt
+to connect to a server through a socket and if successful, issue commands and communicate
+with the server. When the log option is used along with a specified file, the program will
+be able to log a record of the communication between it and the server. When the encrypt
+option is specified with a key file, this will enable encrypted communication between
+the client and server
+
+lab1b-server.c contains the server-side logic written in C. When the user uses the port
+option along with specifying a port number greater than 1024, the process will be able
+to serve clients on the port number and direct any received commands to a child process
+executing the shell. When the encrypted option is specified with a key file, this will 
+enable encrypted communication between the client and server.
+
+my.key contains the encryption key that may be used as the argument to the encryption
+option to enable encrypted communication between the client and server.
+
+Makefile contains the code to build the program and the tarball in this submission.
+
+README contains an overview of the files and other details included in this project.
+
+
+Research
+======
+
+The following links were referenced during this project, in addition to the man pages:
+
+
+http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/server.c
+http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/client.c
+https://ubuntuforums.org/showthread.php?t=1016188
+http://stackoverflow.com/questions/4180818/finding-the-length-of-a-character-array-in-c
+http://www.cplusplus.com/reference/cstring/strcat/
+
+Testing methodology
+======
+
+Most of the testing in this project was done by a combination of observing the 
+output of the program in certain inputs, reading the printed messages from the 
+program, and using the gdb debugger along with breakpoints to view the state 
+of the program at certain points. For observing the encrypted communication, using
+a combination of the log and encrypted options was particularly useful.
+

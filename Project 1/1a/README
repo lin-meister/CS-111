@@ -1,0 +1,39 @@
+NAME: Chaoran Lin
+EMAIL: linmc@ucla.edu
+ID: 004674598
+
+Included files
+======
+
+lab1a.c contains the main source module, written in C. When run with no options,
+it puts the keyboard into non-canonical input mode for the user to interact with.
+When run with the --shell option, it forks a child process that executes a shell.
+On top of that, it performs operations such as piping between the parent and 
+child process, polling input and error events, shutdown processing, etc.
+
+Makefile contains the code to build the program and the tarball in this submission.
+
+README contains an overview of the files and other details included in this project.
+
+
+Research
+======
+
+The following links were referenced during this project, in addition to the man pages:
+
+https://www.gnu.org/software/libc/manual/html_node/Noncanon-Example.html
+https://ece.uwaterloo.ca/~dwharder/icsrts/Tutorials/fork_exec/
+http://tldp.org/LDP/lpg/node11.html
+http://www.tutorialspoint.com/unix_system_calls/waitpid.htm
+http://stackoverflow.com/questions/12444679/poll-function-in-c-how-does-it-work
+https://www.gnu.org/software/libc/manual/html_node/Creating-a-Pipe.html#Creating-a-Pipe
+
+
+Testing methodology
+======
+
+Most of the testing in this project was done by a combination of observing the 
+output of the program in certain inputs, reading the printed messages from the 
+program, and using the gdb debugger along with breakpoints to view the state 
+of the program at certain points.
+

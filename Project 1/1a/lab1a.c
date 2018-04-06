@@ -34,7 +34,7 @@ void set_input_mode ()
   if (!isatty (STDIN_FILENO))
   {
     fprintf (stderr, "Not a terminal.\n");
-    exit(1);
+    exit (EXIT_FAILURE);
   }
 
   struct termios new_termios;
@@ -314,6 +314,6 @@ main (int argc, char **argv)
       }
     } 
   }
-
+  
   return EXIT_SUCCESS;
 }
